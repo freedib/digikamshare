@@ -1,0 +1,326 @@
+
+* {
+	margin:0;
+	padding:0;
+}
+
+html {
+	font: normal 12px Arial, Helvetica, sans-serif;
+}
+
+body {
+}
+
+
+.page-container {
+	display: grid;
+	grid-template-columns: auto 1fr auto auto;
+	grid-template-rows: 3.5rem 7rem 1rem 0.5fr 1rem 0.5fr;
+	height: 100vh;
+	grid-template-areas:
+	  "header-t header-m header-d header-l"
+	  "menu-d   content  content  content"
+	  "menu-aa  content  content  content"
+	  "menu-a   content  content  content"
+	  "menu-tt  content  content  content"
+ 	  "menu-t   content  content  content"
+}
+
+.header-t {
+	grid-area: header-t;
+	padding-left: .5rem;
+	padding-right: .5rem;
+}
+.header-m {
+	grid-area: header-m;
+	padding-right: .5rem;
+}
+.header-d {
+	grid-area: header-d;
+	padding-right: 4rem;
+}
+.header-l {
+	grid-area: header-l;
+	padding-right: .5rem;
+}
+.menu-d {
+	grid-area: menu-d;
+	margin-top: .5rem;
+	margin-left: .5rem;
+}
+.menu-aa {
+	grid-area: menu-aa;
+	margin-left: .5rem;
+	padding-top: 1rem;
+}
+.menu-a {
+	grid-area: menu-a;
+	margin-top: 1.5rem;
+	margin-left: .5rem;
+	margin-bottom: .5rem;
+	overflow-y: auto;	
+}
+.menu-tt {
+	grid-area: menu-tt;
+	margin-left: .5rem;
+padding-top: 1rem;
+}
+.menu-t {
+	grid-area: menu-t;
+	margin-top: 1.5rem;
+	margin-left: .5rem;
+	margin-bottom: .5rem;
+	overflow-y: auto;	
+}
+
+.content {
+	grid-area: content;
+	margin-top: .5rem;
+	margin-left: 1rem;
+	margin-bottom: .5rem;
+	overflow-y: auto;
+}
+
+
+
+/******* header *******/
+
+.header {
+	background-color: #303030;
+	padding-top: 0.3rem;
+	padding-bottom: 1.5rem;
+	color: #fff;
+}
+
+/* header images */
+
+.header img {
+	position: relative;
+	top: 0.3rem;
+	height: 1.5rem;
+	margin-right: 0.4rem;
+}
+
+/* header checkboxes */
+
+.header .base-checkbox {			/* label for checkbox */
+	position: relative;
+	top: 0.3rem;
+	display: inline-block;
+	width: 1.5rem;
+	height: 1.5rem;
+	background-size: cover;
+	margin-right: 0.8rem;
+}
+.header input[type=checkbox] {		/* decoration for checkboxes */
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+/* header checkboxes images */
+
+.header .select-single-off {
+	background-image:url(/images/select-single-off.svg);
+	opacity: 0.8;
+}
+.header .select-single:checked + .base-checkbox {
+	background-image:url(/images/select-single-on.svg);
+	opacity: 1;
+}
+.header .select-range-off {
+	background-image:url(/images/select-range-off.svg);
+	opacity: 0.8;
+}
+.header .select-range:checked + .base-checkbox {
+	background-image:url(/images/select-range-on.svg);
+	opacity: 1;
+}
+.header .select-single-off:hover, .select-range-off:hover {
+	opacity:.7;
+}
+
+/* header buttons */
+
+.header .base-button {				/* input[type=button] marche pas ? */
+	position: relative;
+	top: 0.3rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	background-size: 1.5rem 1.5rem;
+	background:transparent;
+	border:none;
+}
+
+.header input[type=button]:disabled {
+	opacity:.4;
+}
+.header input[type=button]:hover {
+	opacity:.7;
+}
+
+/* header buttons images */
+
+.header .download {
+	background-image:url(/images/download.svg);
+}
+
+.header .lock-open {
+	background-image:url(/images/lock-open.svg);
+}
+.header .lock-closed {
+	background-image:url(/images/lock-closed.svg);
+}
+
+/* input text */
+.header select {		/* decoration for checkboxes */
+	margin-right: 0.4rem;
+}
+
+.header input[type=text], input[type=password] {
+	width: 5rem;
+	margin-right: 0.4rem;
+	font-size: 1rem;
+}
+
+
+/******* menu *******/
+
+.menu .section {
+	display: block;
+	display: none;
+}
+
+.menu span {
+	display: block;
+	font-size: 1rem;
+	font-weight: bold;
+	text-align: left;	
+}
+
+.menu label span {
+	margin-bottom: 0rem;
+	font-weight: bold;
+}
+
+.menu label {
+	display: block;
+	font-size: 1rem;
+	font-weight: bold;
+	text-align: left;
+	line-height: 1.4;
+	border-radius: 0.1rem;
+	box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.12);
+	border: 0;
+	cursor: pointer;
+	height: 1.6rem;
+	padding-top: 0.3rem;
+	margin-bottom: 0.4rem;
+
+	color: #333;
+	background-color: #eee;
+}
+
+.menu .input-block {
+	max-width: 12rem;
+}
+.menu .input-label span {
+	display: inline;
+	text-align: left;
+}
+
+.menu .input-input {
+	float: right;
+	width: 60%;
+	margin-left: 0.5rem;
+}
+
+.menu button, select {
+	margin-bottom: 0.5rem;
+}
+
+.menu input:hover:not([disabled]) + label {
+	background: #ddd;
+}
+
+.menu input:checked + label {
+	background: #bbb;
+}
+
+.menu input:disabled + label {
+	color: #aaa;
+}
+
+.menu input[type=radio] {
+	display: none;
+}
+
+.menu input[type=checkbox] + label {
+	color: #ddd;
+	background: #222;
+}
+
+.menu input[type=checkbox]:hover:not([disabled]) + label {
+	background: #444;
+}
+
+.menu input[type=checkbox]:checked + label {
+	background: #666;
+}
+
+.menu input[type=checkbox] {
+	position: relative;
+/*	top: 0.3rem; */
+	width: 1.5em;
+	height: 1.5em;
+	appearance: none;
+	-webkit-appearance: none;
+ 	-moz-appearance: none;
+	background-color: #e0e0e0;
+	border: 2px solid #ccc;
+	margin-right: .3rem;
+}
+.menu input[type=checkbox]:checked {
+	background-color: #909090;
+	border: 1px solid #4CAF50;
+	box-shadow: inset 0 0 0 0.25em #e0e0e0;
+}
+
+/******* content *******/
+
+.gallery  {
+	list-style: none;
+	text-align: left;
+	font-size: 2rem;
+	cursor: pointer;
+	z-index: 1;
+}
+
+
+/* thumbnails - generated fields */
+
+.image-container {
+	position: relative;
+	display: inline-block;
+	margin-right: 0.5rem;
+}
+.check-overlay {
+	position: absolute;
+	top: .2rem;
+	left: .2rem;
+	z-index: 10;
+	opacity: 0;
+}
+.check-overlay:hover {
+	opacity:1;
+}
+
+
+/* standlone image */
+.image {
+	display: block;
+	margin: auto;
+	max-width: 40%;
+}
+
+

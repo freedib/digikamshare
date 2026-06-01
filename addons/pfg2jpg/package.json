@@ -1,0 +1,49 @@
+{
+  "name": "pgf2jpg",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "PGF to JPG image converter",
+  "keywords": [
+  	"digikam",
+  	"pgf",
+  	"jpg",
+	"jpeg",
+	"memory conversion"
+  ],
+  "type": "module",
+  "main": "./build/Release/pgf2jpg.node",
+  "module": "./src/node/pgf2jpg.mjs",
+  "exports": {
+    "require":"./build/Release/pgf2jpg.node",
+    "import": "./src/node/pgf2jpg.mjs"
+  },
+  "author": "Didier Bertrand",
+  "maintainers": [
+  	{
+  		"name": "Didier Bertrand",
+  		"email": "diblibre@gmail.com",
+  		"url": "https://github.com/diblibre/"
+  	}
+  ],
+  "repository": {
+  	"type": "git",
+  	"url": "git://github.com/diblibre/pgf2jpg.git"
+  },
+  "scripts": {
+    "install": "cmake-js compile"
+  },
+  "engines": {
+    "node": "20.x || 22.x || 23.x || 24.x || 25.x || 26.x"
+  },
+  "dependencies": {
+	"cmake-js": "^8.0.0",
+	"node-addon-api": "^8.7.0"
+  },
+  "files": [
+  	"src",
+  	"CMakeLists.txt"
+  ],
+  "binary": {
+    "napi_versions": [7]
+  }
+}

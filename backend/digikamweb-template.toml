@@ -1,0 +1,57 @@
+
+[server]
+language		= "en"				# server language
+languages		= ["fr","en"]
+
+[database]
+#type			= "sqlite3"			# for SQLite
+type			= "mariadb"			# for MySQL internal/server
+paths_prefix	= "/home"			# prefix to add to digiKam's AlbumRoot.specificPath to get the real photos folder path
+
+[database.sqlite3]
+directory		= "/PATH_TO_SQLITE3_DATABASE"	# directory with .db files
+
+[database.mariadb]
+connection		= "socket"			# choose MySQL internal
+#connection		= "host"			# choose MySQL server
+socket          = "/PATH_TO_MARIADB_SOCKET_FILE"	# (mysql.socket)
+									# for MySQL internal. can be found with ps -ef | grep digikam
+host			= "localhost"		# for MySQL server
+user			= "digikam"			# for MySQL server
+password		= ""				# for MySQL server
+
+[http]
+root_dir		= "../frontend"		# HTML root. may be an absolute path
+port			= 4000
+
+use_blobs		= true				# use blobs to send binary images date. if false, use base64 encoding (larger)
+use_urls		= true				# if true, send url of photos instead of sending their image data
+									# set to false if pictures are not on the same server
+									# thumbails are always sent as image data
+images_root		= "/photos"			# if use_urls, a symbolic link will be made from first dgiKam's AlbumRoot
+									# to {root_dir}/{images_root} to allow access from the navigator
+
+thumbnails_limit = 2000				# maximum thumbnails to display, superceedes users limit
+
+force_ssl		= false	
+ssl_directory	= "."
+
+local_trusted	= true				# login without password if source from localhost
+
+[[users]]
+user			= "admin"
+password		= "admin"
+role			= "admin"
+language		= "en"
+
+[[users]]
+user			= "photo"
+password		= "photo"
+role			= "user"
+language		= "en"
+
+[[users]]							# if local_trusted = true
+user			= "local"				
+password		= ""
+role			= "user"
+language		= "en"

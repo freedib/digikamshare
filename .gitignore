@@ -1,4 +1,12 @@
-node_modules/
-jslibs/
-download/
 .project
+.cproject
+notes.txt
+tables.txt
+.settings/
+photos/*
+node_modules/
+build/*
+build-cli/*
+jslibs/
+download/*
+digikamweb.toml

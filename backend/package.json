@@ -1,0 +1,34 @@
+{
+  "name": "digikam",
+  "version": "1.0.0",
+  "private": true,
+  "type":    "module",
+  "module": "./digikamweb.mjs",
+  "scripts": {
+    "start": "node digikamweb.mjs"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
+  },
+  "dependencies": {
+    "@zip.js/zip.js": "2.7.39",
+    "better-sqlite3": "^12.10.0",
+    "bindings": "^1.5.0",
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mariadb": "^3.5.2",
+    "network": "^0.7.0",
+    "node-gyp": "^12.3.0",
+    "pgf2jpg": "link:../addons/pfg2jpg",
+    "pnpm": "^11.1.1",
+    "toml": "^4.1.1",
+    "unzipper": "^0.12.3"
+  },
+  "devDependencies": {
+    "cmake-js": "^8.0.0",
+    "node-addon-api": "^8.7.0"
+  }
+}

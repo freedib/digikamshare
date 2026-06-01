@@ -1,0 +1,48 @@
+
+
+[fr]
+[fr.backend]
+	Welcome 			= "Bienvenue à"
+	Server 				= "Serveur"
+	Unauthorized		= "Commande non permise"
+	NotFound			= "Pas de données disponibles"
+	NotImplemented		= "Commande pas encore impantée"
+	InternalServerError	= "Erreur interne du serveur"
+	Database			= "Base de données"
+
+[fr.frontend]
+	dateFrom			= "De"
+	dateTo				= "À"
+	maximum				= "Max"
+	albums				= "Albums"
+	tags				= "Étiquettes"
+#	images				= "Images"
+	HTMLError			= "Erreur HTML"
+	InvalidLogin		= "Usager ou mot de passe invalide"
+	InvalidDate			= "Format de date/heure invalide. Ignorée"
+	UnknownData			= "Données pas reconnues"
+	NoData				= "Pas de données reçues"
+
+[en]
+[en.backend]
+	Welcome				= "Welcome to"
+	Server				= "Server"
+	noEnoughRights		= "Command not allowed"
+	NotFound			= "No data available"
+	NotImplemented		= "Command not implemented"
+	InternalServerError	= "Server internal error"
+	Database			= "Database"
+
+[en.frontend]
+	dateFrom			= "From"
+	dateTo				= "To"
+	maximum				= "Max"
+	albums				= "Albums"
+	tags				= "Tags"
+#	images				= "Images"
+	HTMLError			= "HTML error"
+	InvalidLogin		= "Invalid user or password"
+	InvalidDate			= "Invalid date/hour format. Ignored"
+	UnknownData			= "Unknown data"
+	NoData				= "No data received"
+	

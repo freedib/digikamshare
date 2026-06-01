@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+	<meta charset="utf-8">
+
+	<title>digiKam</title>
+
+ 	<link href="css/digikamweb.css" rel="stylesheet">
+
+	<script src="js/libs/jquery-4.0.0.js"></script>
+	<script src="js/digikamweb.js"></script>
+</head>
+
+
+<body>
+	
+	<div class="page-container">
+		
+		<div class="header-t header">
+			<span><h1>digiKam</h1></span>
+		</div>
+		<div class="header-m header">
+			<span id="message"></span>
+		</div>
+		<div class="header-d header">
+			<input type="checkbox" id="select-single" class="select-single"/>
+			<label for="select-single" class="base-checkbox select-single-off"></label>
+			<input type="checkbox" id="select-range" class="select-range"/>
+			<label for="select-range" class="base-checkbox select-range-off"></label>
+			<input type="button" id="download" class="base-button download" disabled value=""/>
+		</div>
+		<div class="header-l header">
+			<select id="language"></select>
+			<img src="images/users.svg" alt="User"/>
+			<input id="username" type="text" value="">
+			<input id="password" type="password" value="">
+			<input type="button" id="loginout" class="base-button lock-open" value=""/>
+		</div>
+		
+		<div class="menu-d menu">
+			<div class="input-block"><label class="input-label" >
+				<span id="lang-dateFrom"></span>
+				<input id="datetime-start" type="text" class="input-input" />
+			</label></div>
+			<div class="input-block"><label class="input-label" >
+				<span id="lang-dateTo"></span>
+				<input id="datetime-end" type="text" class="input-input" />
+			</label></div>
+			<div class="input-block"><label class="input-label" >
+				<span id="lang-maximum"></span>
+				<input id="limits" type="text" class="input-input" />
+			</label></div>
+		</div>
+			
+		<div class="menu-aa menu">
+			<span id="lang-albums"></span>
+		</div>
+		<div class="menu-a menu">
+			<div id="albums-list">
+			</div>
+		</div>
+		<div class="menu-tt menu">
+			<span id="lang-tags"></span>
+		</div>
+		<div class="menu-t menu">
+			<div id="tags-list">
+			</div>
+		</div>
+		
+		<div id="content" class="content">
+			<div>
+				<img id="imagefield" class="image"/>
+			</div>
+			<div id="galleryfield" class="gallery"></div>
+		</div>
+			
+	</div>
+
+</body>
+</html>
