@@ -481,7 +481,11 @@ $(function main() {
 			vars.last_thumbdate = '0000-00-00';
 			for (let irow=0; irow<data.rows.length; irow++) {
 				row = data.rows[irow];
-				let row_thumbDate = row.modificationDate.split(' ')[0];			// remove H:M:S from datetime
+				let row_thumbDate;
+				if (row.modificationDate.indexOf('T')>0)
+					row_thumbDate = row.modificationDate.split('T')[0];			// remove HH:MM:SS.CCC from datetime (SQLite3)
+				else
+					row_thumbDate = row.modificationDate.split(' ')[0];			// remove HH:MM:SS from datetime (Mariadb)
 				let imagekey = ''+row.thumbId+'_'+row.id+'_'+ row_thumbDate;
 				getDataAndThen ('/thumbnails/'+row.thumbId, {}, renderThumnail, imagekey);
 

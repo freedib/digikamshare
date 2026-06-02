@@ -3,10 +3,10 @@
 notes.txt
 tables.txt
 .settings/
-photos/*
+photos/
 node_modules/
-build/*
-build-cli/*
+build/
+build-cli/
 jslibs/
 download/*
 digikamweb.toml

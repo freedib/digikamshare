@@ -493,22 +493,24 @@ function db_open_sqlite3 () {
 		console.log(m(null,'Database')+ ': '+ config.database.type);
 
 		const db_dir = config.database.sqlite3.directory;
-		var dbpath_digikam = path.join (db_dir, 'digikam4.db');
-		var dbpath_thumbs = path.join (db_dir, 'thumbnails-digikam.db');
+		let dbpath_digikam = path.join (db_dir, 'digikam4.db');
+		let dbpath_thumbnails = path.join (db_dir, 'thumbnails-digikam.db');
 
 		if (!fs.existsSync(dbpath_digikam)) {
 			reject('*** database not found: '+dbpath_digikam);
 			return;
 		}
-		if (!fs.existsSync(dbpath_thumbs)) {
-			reject('*** database not found: '+dbpath_thumbs);
+		if (!fs.existsSync(dbpath_thumbnails)) {
+			reject('*** database not found: '+dbpath_thumbnails);
 			return;
 		}
-		db = better_sqlite3 (dbpath_digikam);		//, {verbose:console.log});
 
-		var sql = 'ATTACH DATABASE "'+dbpath_thumbs+'" as dbthumbs';
+		printlog('... MAIN   DATABASE "'+ dbpath_digikam+'"');
+		let db = better_sqlite3 (dbpath_digikam);		//, {verbose:console.log});
+
+		var sql = 'ATTACH DATABASE "'+dbpath_thumbnails+'" as dbthumbs';
 		printlog ('... '+sql)
-		db.exec('ATTACH DATABASE "'+dbpath_thumbs+'" as dbthumbs')
+		db.exec('ATTACH DATABASE "'+dbpath_thumbnails+'" as dbthumbs')
 
 		resolve(db);
 	});
@@ -522,7 +524,7 @@ function db_close_sqlite3 (db) {
 
 function db_query_sqlite3 (db, sql) {
 	return new Promise ((resolve, reject) => {
-		var sqlnice = sql.match(/(.{1,10})/g).join('\n    + ');
+		let nicesql = sql.match(/(.{1,100})/g).join('\n    + ');
 		printlog ('... '+nicesql);
 
 		try {
@@ -570,6 +572,7 @@ function db_open_mariadb () {
 		else
 			throw new Error('Connection parameter invalid');
 		
+		printlog('... USE "digikam"');
 		createConnection(db_info)
 			.then((db) => {
 				resolve(db);
@@ -588,8 +591,8 @@ function db_close_mariadb (db) {
 
 function db_query_mariadb (db, sql) {
 	return new Promise ((resolve, reject) => {
-		var sqlnice = sql.match(/(.{1,100})/g).join('\n    + ');
-		printlog ('... '+sqlnice);
+		var nicesql = sql.match(/(.{1,100})/g).join('\n    + ');
+		printlog ('... '+nicesql);
 		db.query(sql)
 			.then ((rows) => {
 				resolve(rows);
