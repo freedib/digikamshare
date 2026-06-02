@@ -500,6 +500,10 @@ function db_open_sqlite3 () {
 			reject('*** database not found: '+dbpath_digikam);
 			return;
 		}
+		if (!fs.existsSync(dbpath_thumbs)) {
+			reject('*** database not found: '+dbpath_thumbs);
+			return;
+		}
 		db = better_sqlite3 (dbpath_digikam);		//, {verbose:console.log});
 
 		var sql = 'ATTACH DATABASE "'+dbpath_thumbs+'" as dbthumbs';
@@ -853,7 +857,7 @@ function read_albums () {
 			});
 		})
 		.catch ((error) => {
-			console.error(error.message);
+			console.error(error);
 			process.exit(1);
 		});
 })();
