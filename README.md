@@ -9,7 +9,7 @@ An addon to node.js is provided to allow this conversion.
 
 A click on a thumbnail show the original photo.
 
-Oroginal photos can be downloaded to browser in a zip file.
+Original photos can be downloaded to browser in a zip file.
 
 
 In summary:
@@ -19,7 +19,13 @@ In summary:
 
 # Screenshots
 
-[Selection by album](./screenshots/Selection-by-album.png)
+[Search by album and date](./screenshots/Search by album and date.png)
+[Search by date](./screenshots/Search by date.png)
+[Search by tag](./screenshots/Search by tag.png)
+[Click on thumbnail](./screenshots/Click on thumbnail.png)
+[Click on video](./screenshots/Click on video.png)
+[Select for download](./screenshots/Select for download.png)
+[Click on download](./screenshots/Click on download.png)
 
 # Install
 
@@ -48,7 +54,7 @@ Run the server.
 $ node digikamweb.mjs -v
 ```
 
-With a browser open [http://localhost:4000/](http://localhost:4000/).
+With a browser open [http://localhost:4000/](http://localhost:4000/). Port can be configures in digikamweb.toml.
 
 # GUI operation
 
@@ -65,18 +71,21 @@ Wou can narrow search with date start and date end. If no start date, it means d
 The following dates formats are legal
 
 - 2026-06-06 or 20260606,  2016-06 or 202601, 2026. Time is accepted but not used (yy-dmm-dd hh:mm:ss).
-- for a start date, 2026 -> 2026-01-01 and 2026-06 -> 2026-06-01
-- for an end date, 2026 -> 2026-12-31, 2026-06 -> 2026-06-31 (yes 06-31 is legal in SQL!)
+- for a start date, 2026 => 2026-01-01 and 2026-06 => 2026-06-01
+- for an end date, 2026 => 2026-12-31, 2026-02 => 2026-02-31 (yes 02-31 is legal in SQL!)
 
 The limit field allows to speedup searches limiting the number of thumbnails retrieved from server. Il could be 20 when doing your selections (each click start a search) and then 2000 when you yant view the gallery.
 
-Albums are showed in a tree style menu. Some sections may be hidden. It would be possible to have also a tree menu for tags if you use a ":" separator in tags names. The list order for albums can be changed on the top menu.  
+Albums are showed in a tree style menu. Some sections may be hidden. Square buttons are group buttons which open lower level. Round buttons add an album on search list and launch a search.
 
-The gallery design was inspired from Libre-photo. 
-- On the gallery, a click on a photo show the original one.
+It is possible to have a tree menu for tags if you use a ":" separator in tags names.  Note that digiKam embedded tags are not supported for now. We rely instead on tags naming.
+
+The gallery design was inspired from Libre-photo.
+- The sort order be changed on the top menu.
+- On the gallery, a click on a photo or video thumbnail show the original one.
 - A click on this photo (or ESC) dismiss it.
 - A small square on top left of the photo allow to select if for download. you can select many of them with this square or using Ctrl-click on a picture or Shift-click on a picture for a range.
-- Usefull on a cell interface, 2 buttons in the middle of the top menu allow the same functionnality. The first one activates Ctrl-click, the second one, Shift-click and the third one initiate a transfer of selected picture to your browser in a zip file.
+- Usefull on a cell interface, 2 buttons in the middle of the top menu allow the same functionnality. The first one activates selection, the second one, range-selection. The third button one initiate a transfer of selected picture to your browser in a zip file.
 
 Actually translations have been made only for english and french, but it is easy to update the translations.toml to add a new language. Please send me new translations if you add some.
 

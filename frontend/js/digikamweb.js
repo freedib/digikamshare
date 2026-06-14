@@ -66,7 +66,7 @@ $(function main() {
 
 	
 	
-	/////// Login/logout handling ///////
+	////////////// Login/logout handling //////////////
 
 	$(document).ready(function() {
 		$('.menu').hide();
@@ -202,7 +202,7 @@ $(function main() {
 
 
 		
-	/////// Events ///////
+	////////////// Events //////////////
 
 	$(document).keydown(function(event) {
 		if (!vars.state || vars.state=='loggedOut') {
@@ -289,7 +289,8 @@ $(function main() {
 	}
 	
 	
-	/////// Navigation utilities ///////
+	
+	////////////// Navigation utilities //////////////
 
 	
 	function extractDate (datetime_string) {
@@ -306,13 +307,14 @@ $(function main() {
 		return datetime;
 	}
 	
-	// create parameters list for image request
+	// create parameters list for search request
+	// albums id, tags id, dates, max thumbnails, sort
 	function imagesParameters () {
 		let paras_a=[], paras_t=[];
-		getListChecked('albums').forEach(index => {
+		getListSelected('albums').forEach(index => {
 			paras_a.push(vars.albumslist[index].id);
 		});
-		getListChecked('tags').forEach(index => {
+		getListSelected('tags').forEach(index => {
 			paras_t.push(vars.tagslist[index].id);
 		});
 		let ds = extractDate (vars.datetimes.start);
@@ -360,7 +362,7 @@ $(function main() {
 
 	
 
-	/////// Post / Get json data ///////
+	////////////// Post / Get json data //////////////
 	
 	// post parameters using url
 	// if nextstep is string, hide form is requested and adjust navigation hash to go back
@@ -403,6 +405,9 @@ $(function main() {
 	}
 
 	// get data from server and pass data to nextstep
+	// urlbase may contain main album or tag (/album or /tag),
+	//                     thumbnail or image id (/thumbnails or /image) or lang (/translations).
+	// parameters may contain albums id, tags id, dates, max thumbnails, sort (/search) 
 	function getDataAndThen (urlbase, parameters, nextstep, datakey) {
 		const url = createURL(urlbase, parameters);
 	//	console.log ('get '+url+', datakey=');
@@ -436,7 +441,8 @@ $(function main() {
 	}
 	
 	
-	/////// Next steps ///////
+	
+	////////////// Render menu lists //////////////
 
 		
 	// receive albums and tags data from server
@@ -450,10 +456,16 @@ $(function main() {
 			listobj.push(row);
 		}
 		createMenuList (datakey, listobj);	// create list in menu
+
+		let top_element = getListRoot (datakey);
+		top_element.prop('checked',true);					// check top menu element
+		updateMenuListVisibility (top_element);				// show first suv-menu
+
 	}
 	
-
 	// display albums or tags for selection
+	// in first step, a tree is created with albums ans tags
+	// in second step, the tree is converted to html elements
 	function createMenuList (listkey, list) {
 		let html='', tree;
 	//	console.log (list);
@@ -461,13 +473,14 @@ $(function main() {
 	//	console.log(tree);
 		html = '<ul>'+ buildHtmlTree (listkey,list,tree,'') +'</ul>';
 	//	console.log (html);
-			
-		$('#'+listkey+'-list').html(html);
 		
-		let top_element = $('#'+listkey+'-'+tree[Object.keys(tree)[0]].index);
-		updateMenuListVisibility (top_element);
+		let list_div = $('#'+listkey+'-list');				// list container in html page
+		list_div.html(html);					// change div html content to display list
 		
-		// set on click function
+		// set "on click"" on list elements
+		// a click on on child element should launch e search
+		// a click on a closed group element should open the sub-menu
+		// a click on an open group element should close the sub-menu an uncheck all children
 		for (let index=0; index<list.length; index++) {
 			$('#'+listkey+'-'+index).on('click', function(event) {
 			//	let listkey = $(this).prop("name");
@@ -482,25 +495,34 @@ $(function main() {
 					launchSearch ();
 			});
 		}
+
+		// at this point, all list items are shown. hide them
+		let top_element = getListRoot (listkey);
+		updateMenuListVisibility (top_element);
 	}
 	
-	// build a tree a all albums or tags paths
+	// build a tree of all albums or tags paths
+	// create a level for each "/" or ":" separator
+	// listkey is 'albums' or 'tags'
+	// list is the list received from the server
+	// create group items if they don't exist in original list
 	function characterizeTree (listkey, list) {
 		let tree={}, ptree;
 		let ilist, ipart, item;
 		for (ilist=0; ilist<list.length; ilist++) {
+			
 			if (listkey=='albums')
 				item = list[ilist].relativePath;
 			else if (listkey=='tags' && list[ilist].pid==4)
 				item = list[ilist].name;
 			else
 				continue;
+			
 			let parts;
 			if (listkey=='albums') {
 				parts = item.split('/');
-				if (parts.length==2 && parts[0]=='' && parts[1]=='') {
-					parts = [''];						// "/" created 2 parts
-				}
+				if (parts.length==2 && parts[0]=='' && parts[1]=='')
+					parts = [''];						// "/" created two parts. remove one
 			}
 			else {
 				item = ':'+item;						// add a level to users to allow hide groups
@@ -508,6 +530,7 @@ $(function main() {
 				for (let ip=0; ip<parts.length; ip++)
 					parts[ip] = parts[ip].trim();
 			}
+			
 			// create nodes for all items on path. sometime parents items may come later in list
 			for (ipart=0, ptree=tree; ipart<parts.length; ipart++) {
 				let node='node_'+parts[ipart];
@@ -530,6 +553,7 @@ $(function main() {
 	}
 
 	// build the HTML tree
+	// id of html elements are indexes in the list and not the real database index
 	function buildHtmlTree (listkey, list, tree, classes) {
 		let html='';
 
@@ -538,30 +562,33 @@ $(function main() {
 				let node = tree[key];
 
 				if (node.index<0) {
-					// a group name for persons (group: name) have been specified
-					// create a fake tag entry to control children
+					// a non existent group name for persons (group: name) have been specified
+					// create a list item to control children
 					node.index = list.length;
 					list[list.length] = {};						
 				}
 				
-				let effectiveclasses;
-				if (node.children>0)			// set checkbox style
-					effectiveclasses = 'group '+classes;
+				let element_classes;
+				if (node.children>0)
+					element_classes = 'group '+classes;
 				else
-					effectiveclasses = 'child '+classes;
+					element_classes = 'child '+classes;
 					
 				let li = '<input type="checkbox" '+
 						'id="'+listkey+'-'+node.index+'" name="'+listkey+'" '+
-						'class="'+effectiveclasses+'" ' +
+						'class="'+element_classes+'" ' +
 						'value="'+node.index+'">'+key.substr(5,);
 
 				if (node.children==0)
-					html += '<li class="'+effectiveclasses+'">'+li+'</li>';
+					html += '<li class="'+element_classes+'">'+li+'</li>';
 				else {
 					let group_class = listkey+'-'+node.index;	// define a class to hide children
 					let symbol = listkey=='albums'? '/': ':';
-					html += '<li class="'+effectiveclasses+'">'+li+symbol+'<ul>';
+					html += '<li class="'+element_classes+'">'+li+symbol+'<ul>';
+					
+					// recursive call for children with this group class added
 					html += buildHtmlTree (listkey, list, node, classes+' '+group_class);
+					
 					html += '</ul></li>';
 				}
 			}
@@ -569,18 +596,34 @@ $(function main() {
 		return html;
 	}
 	
-	// find items checked in album and tags lists
-	function getListChecked (listkey) {
+	// return first root html element for a list
+	function getListRoot (listkey) {
+		let list_div = $('#'+listkey+'-list');			// list container in html page
+		let top_element = list_div.children('ul').children('li').children('input');
+		return top_element;
+	}
+
+	// find child items checked in album and tags lists
+	function getListSelected (listkey) {
 		var values=[];
-		let htmlkey = listkey+'-list';
-		let items = $('#'+htmlkey).find('.child:checkbox:checked').filter(function(){
+		let list_div = listkey+'-list';
+		let items = $('#'+list_div).find('.child:checkbox:checked').filter(function(){
 			values.push($(this).val());
 		});
 		return values;
 	}
 
-	
-	// save selected items in list to restore after a sort
+	// find input items checked in album and tags lists
+	function getListChecked (listkey) {
+		var values=[];
+		let list_div = listkey+'-list';
+		let items = $('#'+list_div).find('input:checkbox:checked').filter(function(){
+			values.push($(this).val());
+		});
+		return values;
+	}
+
+	// save checked items in list to restore after a sort
 	function saveListChecked (listkey, list) {
 		let itemslist = getListChecked (listkey);
 		for (let index=0; index<list.length; index++)
@@ -609,31 +652,37 @@ $(function main() {
 	function updateMenuListVisibility (element, shiftkey) {
 		// hide or show class
 		if ($(element).is(':checked')) {
-			if (shiftkey) {														// open all submenus
-				$('.'+$(element).prop('id')).show();							// children have parent id as class. show them
-				$(element).next('ul').find('input').filter(function() {			// open all children groups
+			if (shiftkey) {												// open all submenus
+				$('.'+$(element).prop('id')).show();					// children have parent id as class. show them
+				$(element).next('ul').find('input').filter(function() {	// open all children groups
 					return $(this).hasClass('group')
 				}).prop('checked', true);
 			}
-			else {																// open just first level of children
+			else {														// open just first level of children
 			//	$(element).next('ul').show();
 				$(element).next('ul').children('li').show();
 				$(element).next('ul').children('li').children('input').show();
 			}
 		}
 		else {
-			$(element).next('ul').find('input').prop('checked', false);			// uncheck children checkbox
-			$('.'+$(element).prop('id')).hide();								// children have parent id as class. hide them
+			$(element).next('ul').find('input').prop('checked', false);	// uncheck children checkbox
+			$('.'+$(element).prop('id')).hide();						// children have parent id as class. hide them
 		}
 		$(element).parent().parent().prev('input').prop('checked', true);
 	}
 
 
-	/////// Render gallery ///////
-
 	
-	// query a search for images and for the received list of thumbnails call renderThumnail
+	////////////// Render gallery //////////////
+
+		
+	// next step after receiving list of thumbnails (/thumbnails)
 	// handle event on images
+	
+	// create a gallery or images with date titles
+	// first en empty frame is created with all date titles and all thumbnails html elements
+	// the for each thumbnail, a request is sent to server to get thumbnail data
+	
 	function renderGallery (data) {
 		$('#media-container').unbind();
 		$('#media-container').empty();
@@ -688,7 +737,8 @@ $(function main() {
 		}
 	}
 
-	// query a thumbnail and add the received blob or base64 thumbnail to the gallery
+	// in response on a thumbnail query, the received blob or base64 thumbnail is set as image source of the thumbnail
+	// a thumbnail have also a checkbox associated. Set events handler for both the thumbnail and the checkbox
 	function renderThumnail (data, imagekey) {
 	
 		let imageUrl = getImageURL(data);
@@ -727,7 +777,7 @@ $(function main() {
 			}
 		});
 
-		checkbox.on('click', [imagekey], function(event) {		// checkbox clicked. add/remove to selection list
+		checkbox.on('click', [imagekey], function(event) {				// checkbox clicked. add/remove to selection list
 			let imagekey = event.data[0];
 			updateImagesSelection ('checkbox', event.data[0], event);
 			vars.last_imagekey = imagekey;
@@ -787,7 +837,7 @@ $(function main() {
 		enableField ($('#download'), vars.selectedkeys.length>0);	// enable/disable download
 	}
 
-	// allow selection with mouse or header buttons
+	// allow selection with mouse or top menu buttons
 	function getSelectionMode (event) {
 	//	console.log ('ctrlKey, altKey, shiftKey:', event.ctrlKey, event.altKey, event.shiftKey);
 	//	console.log ('select some, range:', $('#select-single').is(':checked'), $('#select-range').is(':checked'));
@@ -809,9 +859,12 @@ $(function main() {
 
 	
 
-	/////// Render single image ///////
+	////////////// Render single image //////////////
 
-	// display and inageURL
+	
+	// next step after receiving list of images (/images)
+	// create an imageURL from data and set "media-container" html element's source
+	
 	function renderImage (data) {
 		imageUrl = getImageURL(data);
 
