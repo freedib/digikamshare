@@ -1,61 +1,59 @@
 
-[server]
-language		= "en"				# server language
-languages		= ["fr","en"]
-
 [database]
-#type			= "sqlite3"			# uncomment for SQLite
-type			= "mariadb"			# uncomment for MySQL internal/server
-paths_prefix	= "/home"			# prefix to add to digiKam's AlbumRoot.specificPath to get the real photos folder path
+#type				= "sqlite	"		# UNCOMMENT for SQLite
+#type				= "mysql_internal"	# UNCOMMENT for MySQL internal
+type				= "mysql_server"	# UNCOMMENT for MySQL server
 
-[database.sqlite3]
-directory		= "/PATH_TO_SQLITE3_DATABASE"	# directory with .db files
+[database.sqlite]
+directory			= "/PATH_TO_SQLITE3_DATABASE"		# directory with .db files
 									# when SQLite
-
-[database.mariadb]
-connection		= "socket"			# uncomment for MySQL internal
-#connection		= "host"			# uncomment for MySQL server
-socket          = "/PATH_TO_MARIADB_SOCKET_FILE"	# (mysql.socket)
+[database.mysql_internal]
+socket          	= "/PATH_TO_MARIADB_SOCKET_FILE"	# (mysql.socket)
 									# when MySQL internal. can be found with ps -ef | grep digikam
-host			= "localhost"		# when MySQL server
-user			= "digikam"			# when MySQL server
-password		= "PASSWORD"		# when MySQL server
+[database.mysql_server]
+host				= "localhost"	# when MySQL server
+user				= "digikam"		# when MySQL server
+password			= "PASSWORD"	# when MySQL server
 
 [http]
-root_dir		= "../frontend"		# HTML root. may be an absolute path
-port			= 4000				# choose prefered port
+root_dir			= "../frontend"	# HTML root. may be an absolute path
+port				= 4000			# choose prefered port
+force_ssl			= false			# if true, use https
+ssl_directory		= "./ssl"
 
-use_blobs		= true				# use blobs to send binary images date. if false, use base64 encoding (larger)
-use_urls		= true				# if true, send url of photos instead of sending their image data
+[frontend]
+thumbnails_default	= 50			# initial value on browser
+default_sort		= "desc"		# initial sorting order. "asc" or "desc"
+force_tags_asc		= true			# if true, tags always "asc"
+
+[backend]
+languages			= ["fr","en"]	# supported languages
+language			= "en"			# server language
+persons_tag			= "Persons"		# root tag name for tags. ADJUST for your database language
+thumbnails_limit	= 2000			# maximum thumbnails to display, superceedes users limit
+use_blobs			= true			# if use blobs to send thumbnails or photos binary data. if false, use base64 encoding (larger)
+use_urls			= true			# if true, send url of photos instead of sending their binary data
 									# set to false if pictures are not on the same server
-									# thumbails are always sent as image data
-images_root		= "/photos"			# if use_urls, a symbolic link will be made from first dgiKam's AlbumRoot
-									# to {root_dir}/{images_root} to allow access from the navigator
+									# url is relative to {frontend_dir}/{images_root}
+									# thumbnails are always sent as image data
+images_root			= "/photos"		# if use_urls, a symbolic link will be made from first dgiKam's AlbumRoot
+									# to {frontend_dir}/{images_root} to allow access from the navigator
+paths_prefix		= "/home"		# prefix to add to digiKam's AlbumRoot.specificPath to get the real photos folder path
+local_trusted		= true			# login without password if source from localhost
 
-thumbnails_limit   = 2000			# maximum thumbnails to display, superceedes users limit
-thumbnails_default = 50				# initial value on browser
-default_sort	   = "desc"			# initial sorting order. "asc" or "desc"
-force_tags_asc	   = true			# if true, tags always "asc"
-
-force_ssl		= false				# if true, use https
-ssl_directory	= "./ssl"
-
-
-local_trusted	= true				# login without password if source from localhost
-
-[[users]]							# special for login without user/password if local_trusted = true
-user			= "local"				
-password		= ""
-language		= "en"
+[[users]]							# special user for login without user/password if local_trusted = true
+user				= "local"				
+password			= ""
+language			= "en"
 
 [[users]]							# normal user from web with full access
-user			= "photo"
-password		= "photo"
-language		= "fr"
+user				= "photo"
+password			= "photo"
+language			= "fr"
 
 [[users]]							# user from web with limited access
-user			= "share"
-password		= "share"
-language		= "en"
-restrict_albums = ["/album-1", "/album-2"]	# allowed albums
-restrict_tags   = ["name","wildcard *"]		# allowed tags by name or wildcard (just start of name checked)
+user				= "share"
+password			= "share"
+language			= "en"
+restrict_albums		= ["/album-1", "/album-2"]	# allowed albums
+restrict_tags		= ["name","wildcard *"]		# allowed tags by name or wildcard (just start of name checked)

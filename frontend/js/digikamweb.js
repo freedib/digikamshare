@@ -23,14 +23,16 @@ $(function main() {
 			vars.albumslist     = [];					// selected albums
 			vars.tagslist       = [];					// selected tags
 			vars.datetimes      = {start:'', end:''};	// selected datetimes
+			vars.persons_tag    = "";					// root persons tag
 			vars.max_thumbnails = 20;					// selected maximum thumbnails to display. normal: 100-2000
 			vars.default_sort   = "desc";				// initial sorting order. "asc" or "desc"
 			vars.force_tags_asc = true;					// if true, tags always "asc"
-			
 			vars.selectedkeys   = [];					// images id if thumbnail in gallery
 			vars.imagekeys      = [];					// selected images
 			vars.last_thumbdate = null;					// last thumbdate displayed in gallery
 			vars.last_imagekey  = null;					// last thumbid clicked
+			vars.root_tag_id    = 0;					// usually the first one
+			vars.persons_tag_id = 4;					// usually the 4th. will be updated
 		}		
 	}
 	
@@ -91,6 +93,7 @@ $(function main() {
 						vars.state = row.state;
 						vars.role = row.role;
 						vars.lang = row.lang;
+						vars.persons_tag = row.persons_tag;
 						vars.max_thumbnails = row.max_thumbnails? row.max_thumbnails: '';
 						vars.default_sort = row.default_sort!=null? row.default_sort.toLowerCase(): vars.default_sort;
 						vars.force_tags_asc = row.force_tags_asc!=null? row.force_tags_asc: vars.force_tags_asc;
@@ -513,8 +516,22 @@ $(function main() {
 			
 			if (listkey=='albums')
 				item = list[ilist].relativePath;
-			else if (listkey=='tags' && list[ilist].pid==4)
-				item = list[ilist].name;
+			else if (listkey=='tags') {
+				if (list[ilist].pid==-1) {
+					vars.root_tag_id = list[ilist].id;
+					continue;
+				}
+				else if (list[ilist].name==vars.persons_tag && list[ilist].pid==vars.root_tag_id) {
+					vars.persons_tag_id = list[ilist].id;
+					continue;
+				}
+				else if (list[ilist].pid==vars.persons_tag_id && list[ilist].id<8)
+					continue;				// ignore unknowns, ignored and non confirmed
+				else if (list[ilist].pid==vars.persons_tag_id)
+					item = list[ilist].name;
+				else
+					continue;
+			}
 			else
 				continue;
 			

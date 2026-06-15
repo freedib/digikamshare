@@ -160,7 +160,7 @@ function m (res,messageid) {
 	if (res && res.req && res.req.session && res.req.session.lang)
 		i18n_section = i18n[res.req.session.lang];
 	else
-		i18n_section = i18n[config.server.language];
+		i18n_section = i18n[config.backend.language];
 	if (i18n_section && i18n_section.backend)
 		return i18n_section.backend[messageid];
 	else
@@ -208,7 +208,7 @@ app.post('/login', function(req, res) {
 	let allow_local=false;
 
 	let hostname = req.headers.host.split(':')[0];
-	if (session.username.length==0 && config.http.local_trusted && hostname=='localhost') {
+	if (session.username.length==0 && config.backend.local_trusted && hostname=='localhost') {
 		session.username = 'local';
 		allow_local = true;
 	}
@@ -234,9 +234,10 @@ app.post('/login', function(req, res) {
 		session.state = 'loggedIn';
 
 		respond_json(res, {	type:'table/login', rows:[{state:session.state, username:session.username,
-						   	role:session.role, max_thumbnails:config.http.thumbnails_default,
-							default_sort:config.http.default_sort, force_tags_asc:config.http.force_tags_asc, 
-							lang:session.lang, languages:config.server.languages, translations:i18n[session.lang]}]});
+						   	role:session.role, persons_tag:config.backend.persons_tag, 
+							max_thumbnails:config.frontend.thumbnails_default,
+							default_sort:config.frontend.default_sort, force_tags_asc:config.frontend.force_tags_asc, 
+							lang:session.lang, languages:config.backend.languages, translations:i18n[session.lang]}]});
 		// add session to server sessions list
 		sessions[session.key] = {state: session.state, user:config.users[iuser]};
 		printwlog ('??? login:  sessions('+Object.keys(sessions).length+'): +++', session.key);
@@ -301,7 +302,7 @@ app.get('/tags{/:id}', function(req, res) {
 // else return thumbnails list corresponding to search parameters
  app.get('/search{/:id}', function(req, res) {
 	let user_max_thumbnails = req.query.max_thumbnails==''? 100000: req.query.max_thumbnails;
-	let server_max_thumbnails = config.http.thumbnails_limit;
+	let server_max_thumbnails = config.backend.thumbnails_limit;
 	let max_thumbnails = ''+ Math.min (Number(server_max_thumbnails), Number(user_max_thumbnails));
 	let limit = create_search_limit (max_thumbnails);
 	let sort = req.query.sort? req.query.sort: 'ASC';
@@ -411,7 +412,7 @@ function respond_image (res, imageinfo) {
 	//  {type:'image/jpeg', data:jpgdata, width:200, height:100}
 	res.setHeader('X-image-width', imageinfo.width);
 	res.setHeader('X-image-height', imageinfo.height);
-	if (config.http.use_blobs) {					// blob
+	if (config.backend.use_blobs) {					// blob
 		const imageBlob = new Blob([imageinfo.data], { type: imageinfo.type });
 		res.type(imageBlob.type);
 		imageBlob.arrayBuffer().then((imageArrayBuffer) => {
@@ -420,7 +421,7 @@ function respond_image (res, imageinfo) {
 		});
 	}
 	else {											// base64 + json
-		imageBase64 = imageinfo.data.toString('base64');
+		let imageBase64 = imageinfo.data.toString('base64');
 		respond_json (res, {type:'image/base64', rows:[{data:imageBase64}]});
 	}
 }
@@ -467,7 +468,7 @@ function respond_image_data (res, sql, id) {
 		.then ((rows) => {
 			if (rows.length < 1)
 				respond_http_error (res, 404);
-			else if (config.http.use_urls) {			// url of image
+			else if (config.backend.use_urls) {			// url of image
 				const url = get_image_url (rows[0].album, rows[0].name);
 				respond_json(res, {type:'image/url', rows:[{id:id, url:url}]});
 			}
@@ -477,7 +478,7 @@ function respond_image_data (res, sql, id) {
 					if (error)
 						respond_http_error (res, 404);
 					else {
-						imageinfo = {data:data, type:'image/jpeg', width:'0', height:'0'};
+						let imageinfo = {data:data, type:'image/jpeg', width:'0', height:'0'};
 						respond_image (res, imageinfo);
 					}
 				});
@@ -515,12 +516,12 @@ var db_open, db_close, db_query
 db_config ();
 
 function db_config () {
-	if (config.database.type=='sqlite3') {
+	if (config.database.type=='sqlite') {
 		db_open  = db_open_sqlite3;
 		db_close = db_close_sqlite3;
 		db_query = db_query_sqlite3;
 	}
-	else if (config.database.type=='mariadb') {
+	else if (config.database.type=='mysql_internal' || config.database.type=='mysql_server') {
 		db_open  = db_open_mariadb;
 		db_close = db_close_mariadb;
 		db_query = db_query_mariadb;
@@ -538,7 +539,7 @@ function db_open_dummy () {
 
 function db_open_sqlite3 () {
 	return new Promise ((resolve, reject) => {
-		db_tables['sqlite3'] = {
+		db_tables['sqlite'] = {
 			AlbumRoots:       'AlbumRoots',
 			Albums:           'Albums',
 			Tags:             'Tags',
@@ -551,7 +552,7 @@ function db_open_sqlite3 () {
 
 		console.log(m(null,'Database')+ ': '+ config.database.type);
 
-		const db_dir = config.database.sqlite3.directory;
+		const db_dir = config.database.sqlite.directory;
 		let dbpath_digikam = path.join (db_dir, 'digikam4.db');
 		let dbpath_thumbnails = path.join (db_dir, 'thumbnails-digikam.db');
 
@@ -600,7 +601,7 @@ function db_query_sqlite3 (db, sql) {
 
 function db_open_mariadb () {
 	return new Promise ((resolve, reject) => {
-		db_tables['mariadb'] = {
+		db_tables['mysql'] = {
 			AlbumRoots:       'AlbumRoots',
 			Albums:           'Albums',
 			Tags:             'Tags',
@@ -611,21 +612,21 @@ function db_open_mariadb () {
 			Thumbnails:       'Thumbnails',
 		}
 
-		console.log(m(null,'Database') + ': ' + config.database.type + ' ' + config.database.mariadb.connection);
+		console.log(m(null,'Database') + ': ' + config.database.type);
 
 		let db_info;
-		if (config.database.mariadb.connection=='host')
+		if (config.database.type=='mysql_internal')
 			db_info = {
-				host: config.database.mariadb.host,
-				user: config.database.mariadb.user,
-				password: config.database.mariadb.password,
+				socketPath: config.database.mysql_internal.socket,
 				database: 'digikam',
 				bigIntAsNumber: true,
 				dateStrings: true,
 			};
-		else if (config.database.mariadb.connection=='socket')
+		else if (config.database.type=='mysql_server')
 			db_info = {
-				socketPath: config.database.mariadb.socket,
+				host: config.database.mysql_server.host,
+				user: config.database.mysql_server.user,
+				password: config.database.mysql_server.password,
 				database: 'digikam',
 				bigIntAsNumber: true,
 				dateStrings: true,
@@ -674,7 +675,7 @@ var sql_statements = {
 	albums_list:	'SELECT id, albumRoot, relativePath FROM ${Albums} ' +
 					'ORDER BY relativePath ${sort}', 
 	tags_list:		'SELECT id, pid, name FROM ${Tags} ' +
-					'ORDER BY name ${sort}',
+					'ORDER BY pid, name ${sort}',
 	thumbnail_data:	'SELECT ${Thumbnails}.id, ${Thumbnails}.modificationDate, ${Thumbnails}.orientationHint, ' +
 						   '${Thumbnails}.data FROM ${Thumbnails} ' +
 					'${where}',
@@ -706,7 +707,7 @@ function get_sql (statement_key, args) {
 
 // replace ${table} and ${arg} variables
 function replace_sql (statement, args) {
-	let tables = db_tables[config.database.type];
+	let tables = db_tables[config.database.type=='sqlite'? 'sqlite': 'mysql'];
 	for (let table in tables)
 		statement = statement.replaceAll('${'+table+'}', tables[table]);
 	for (let arg in args)
@@ -873,13 +874,13 @@ function get_image_path (album, name) {
 	const album_root_id = albums_list[album].albumRoot;
 	const root_path = album_roots[album_root_id].specificPath;
 	const album_path = albums_list[album].relativePath;
-	return path.join (config.database.paths_prefix, root_path+album_path, name);
+	return path.join (config.backend.paths_prefix, root_path+album_path, name);
 }
 function get_image_url (album, name) {
 	const album_root_id = albums_list[album].albumRoot;
 	const root_label = album_roots[album_root_id].label;
 	const album_path = albums_list[album].relativePath;
-	return path.join (config.http.images_root, root_label, album_path, name);
+	return path.join (config.backend.images_root, root_label, album_path, name);
 }
 
 // create symbolic link for albums_root in frontend/photos
@@ -889,11 +890,11 @@ function read_roots () {
 			album_roots = [];
 			for (let irow=0; irow<rows.length; irow++) {
 				album_roots[rows[irow].id] = rows[irow];
-				if (config.http.use_urls) {
+				if (config.backend.use_urls) {
 					try {
-					//	printlog('ln -s '+config.database.paths_prefix+rows[irow].specificPath+' '+root_dir);
-						const src = config.database.paths_prefix+rows[irow].specificPath;
-						const dst = path.join (root_dir, config.http.images_root, rows[irow].label);
+					//	printlog('ln -s '+config.backend.paths_prefix+rows[irow].specificPath+' '+root_dir);
+						const src = config.backend.paths_prefix+rows[irow].specificPath;
+						const dst = path.join (root_dir, config.backend.images_root, rows[irow].label);
 						fs.symlink(src, dst, (error) => {
 							// console.log(error);
 						});
