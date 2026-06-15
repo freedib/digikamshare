@@ -76,9 +76,7 @@ The following dates formats are legal
 
 The limit field allows to speedup searches limiting the number of thumbnails retrieved from server. Il could be 20 when doing your selections (each click start a search) and then 2000 when you yant view the gallery.
 
-Albums are showed in a tree style menu. Some sections may be hidden. Square buttons are group buttons which open lower level. Round buttons add an album on search list and launch a search.
-
-It is possible to have a tree menu for tags if you use a ":" separator in tags names.  Note that digiKam embedded tags are not supported for now. We rely instead on tags naming.
+Albums and tags are showed in a tree style menu. Some sections may be hidden. Square buttons are group buttons which open lower level. Round buttons add an album on search list and launch a search.
 
 The gallery design was inspired from Libre-photo.
 - The sort order be changed on the top menu.

@@ -31,8 +31,6 @@ $(function main() {
 			vars.imagekeys      = [];					// selected images
 			vars.last_thumbdate = null;					// last thumbdate displayed in gallery
 			vars.last_imagekey  = null;					// last thumbid clicked
-			vars.root_tag_id    = 0;					// usually the first one
-			vars.persons_tag_id = 4;					// usually the 4th. will be updated
 		}		
 	}
 	
@@ -517,20 +515,14 @@ $(function main() {
 			if (listkey=='albums')
 				item = list[ilist].relativePath;
 			else if (listkey=='tags') {
-				if (list[ilist].pid==-1) {
-					vars.root_tag_id = list[ilist].id;
+				// build parents path
+				if (list[ilist].pid==-1)
 					continue;
+				item = list[ilist].name;
+				for (let il=ilist; list[il].pid!=0;) {
+					il = list.findIndex(t => t.id==list[il].pid);
+					item = list[il].name+'/'+item;
 				}
-				else if (list[ilist].name==vars.persons_tag && list[ilist].pid==vars.root_tag_id) {
-					vars.persons_tag_id = list[ilist].id;
-					continue;
-				}
-				else if (list[ilist].pid==vars.persons_tag_id && list[ilist].id<8)
-					continue;				// ignore unknowns, ignored and non confirmed
-				else if (list[ilist].pid==vars.persons_tag_id)
-					item = list[ilist].name;
-				else
-					continue;
 			}
 			else
 				continue;
@@ -542,8 +534,8 @@ $(function main() {
 					parts = [''];						// "/" created two parts. remove one
 			}
 			else {
-				item = ':'+item;						// add a level to users to allow hide groups
-				parts = item.split(':');
+				item = '/'+item;						// add a level to users to allow hide groups
+				parts = item.split('/');
 				for (let ip=0; ip<parts.length; ip++)
 					parts[ip] = parts[ip].trim();
 			}
@@ -600,8 +592,7 @@ $(function main() {
 					html += '<li class="'+element_classes+'">'+li+'</li>';
 				else {
 					let group_class = listkey+'-'+node.index;	// define a class to hide children
-					let symbol = listkey=='albums'? '/': ':';
-					html += '<li class="'+element_classes+'">'+li+symbol+'<ul>';
+					html += '<li class="'+element_classes+'">'+li+'/'+'<ul>';
 					
 					// recursive call for children with this group class added
 					html += buildHtmlTree (listkey, list, node, classes+' '+group_class);

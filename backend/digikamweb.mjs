@@ -863,24 +863,33 @@ async function respond_zip_create (res, rows) {
 
 // on start, read album_roots and albums to know read pictures path
 // also used to constrict search request when user have restricted_albums
-var album_roots = []
-var albums_list = []
+var album_roots = [];
+var albums_list = [];
 
 // on start, read tags to expand user restricted_tags wildcards 
-var tags_list = []
+var tags_list = [];
+var tags_list_names = [];		// expanded names for restricted tags
 
 
-function get_image_path (album, name) {
-	const album_root_id = albums_list[album].albumRoot;
-	const root_path = album_roots[album_root_id].specificPath;
-	const album_path = albums_list[album].relativePath;
-	return path.join (config.backend.paths_prefix, root_path+album_path, name);
+function get_image_path (album_id, name) {
+	let album_index = albums_list.findIndex(a => a.id==album_id);
+	let album_root_id = albums_list[album_index].albumRoot;
+	let album_root_index = album_roots.findIndex(a => a.id==album_root_id);
+	let root_path = album_roots[album_root_index].specificPath;
+	let album_path = albums_list[album_index].relativePath;
+	let full_path = path.join (config.backend.paths_prefix, root_path+album_path, name);
+//	printlog('get_image_path', root_path, album_path, full_path);
+	return full_path;
 }
-function get_image_url (album, name) {
-	const album_root_id = albums_list[album].albumRoot;
-	const root_label = album_roots[album_root_id].label;
-	const album_path = albums_list[album].relativePath;
-	return path.join (config.backend.images_root, root_label, album_path, name);
+function get_image_url (album_id, name) {
+	let album_index = albums_list.findIndex(a => a.id==album_id);
+	let album_root_id = albums_list[album_index].albumRoot;
+	let album_root_index = album_roots.findIndex(a => a.id==album_root_id);
+	let root_label = album_roots[album_root_index].label;
+	let album_path = albums_list[album_index].relativePath;
+	let url = path.join (config.backend.images_root, root_label, album_path, name);
+//	printlog('get_image_url', root_label, album_path, url);
+	return url;
 }
 
 // create symbolic link for albums_root in frontend/photos
@@ -889,7 +898,7 @@ function read_roots () {
 		.then ((rows) => {
 			album_roots = [];
 			for (let irow=0; irow<rows.length; irow++) {
-				album_roots[rows[irow].id] = rows[irow];
+				album_roots[irow] = rows[irow];
 				if (config.backend.use_urls) {
 					try {
 					//	printlog('ln -s '+config.backend.paths_prefix+rows[irow].specificPath+' '+root_dir);
@@ -912,7 +921,7 @@ function read_albums () {
 		.then ((rows) => {
 			albums_list = [];
 			for (let irow=0; irow<rows.length; irow++)
-				albums_list[rows[irow].id] = rows[irow];
+				albums_list[irow] = rows[irow];
 			printlog(''+albums_list.length+' albums_list');
 		})
 		.catch ((error) => { console.error(error)});
@@ -924,7 +933,7 @@ function read_tags () {
 		.then ((rows) => {
 			tags_list = [];
 			for (let irow=0; irow<rows.length; irow++)
-				tags_list[rows[irow].id] = rows[irow];
+				tags_list[irow] = rows[irow];
 			printlog(''+tags_list.length+' tags_list');
 		})
 		.catch ((error) => { console.error(error)});
@@ -946,9 +955,10 @@ function update_restricted_albums (sessionkey) {
 			else
 				console.error ('*** invalid restricted_album: '+user.restrict_albums[ira]);
 		}
-		printwlog ('update_restricted_albums: user.albumsid=', user.albumsid);
+		printwlog ('update_restricted_albums: user.albumsid =', user.albumsid);
 	}
 }
+
 
 // get restricted tagsid for a user after a login
 // expand '*' wildcard
@@ -957,21 +967,39 @@ function update_restricted_tags (sessionkey) {
 	user.tagsid = null;
 
 	if (user.restrict_tags && user.restrict_tags.length>0) {
+		
+		// the first time, build tags list with expanded names and pids
+		if (tags_list_names.length==0) {
+			tags_list_names = [];
+			for (let it=0; it<tags_list.length; it++) {
+				if (tags_list[it].pid==-1)
+					continue;
+				let fullname = tags_list[it].name;
+				let pids=[tags_list[it].pid];
+				for (let il=it; tags_list[il].pid!=0;) {
+					il = tags_list.findIndex(t => t.id==tags_list[il].pid);
+					fullname = tags_list[il].name+'/'+fullname;
+					pids.push(tags_list[il].pid);
+				}
+				tags_list_names[it] = {name:fullname,pids:pids};
+			}
+		}
+		
 		user.tagsid = [];
+		// for each restricted tag search the string in expanded names and add tag id to user.tagsid
+		// must also add all parents id to be able to display them in browser
 		for (let irt=0; irt<user.restrict_tags.length; irt++) {
-			let urt = tags_list.find(rt => rt && rt.name==user.restrict_tags[irt]);
-			let istar;
-			if (urt)
-				user.tagsid.push(urt.id);
-			else if ((istar = user.restrict_tags[irt].indexOf('*')) >= 0) {
-				let starttag = user.restrict_tags[irt].substr(0,istar); 
-				for (let it=0; it<tags_list.length; it++) {
-					if (tags_list[it] && tags_list[it].name.startsWith(starttag))
-						user.tagsid.push(tags_list[it].id);
+			for (let it=0; it<tags_list.length; it++) {
+				let parents=[];
+				if (tags_list_names[it] && tags_list_names[it].name.indexOf(user.restrict_tags[irt])>=0) {
+					user.tagsid.push(tags_list[it].id);
+					for (let ip=0; ip<tags_list_names[it].pids.length; ip++)
+						if (user.tagsid.indexOf(tags_list_names[it].pids[ip])<0)
+							user.tagsid.push(tags_list_names[it].pids[ip]);
 				}
 			}
 		}
-		printwlog ('update_restricted_tags: user.tagsid=', user.tagsid);
+		printwlog ('update_restricted_tags: user.tagsid =', user.tagsid);
 	}
 }
 
