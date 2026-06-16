@@ -1,6 +1,6 @@
 
 [database]
-#type				= "sqlite	"		# UNCOMMENT for SQLite
+#type				= "sqlite"			# UNCOMMENT for SQLite
 #type				= "mysql_internal"	# UNCOMMENT for MySQL internal
 type				= "mysql_server"	# UNCOMMENT for MySQL server
 
