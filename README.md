@@ -14,8 +14,9 @@ Original photos can be downloaded to browser in a zip file.
 
 In summary:
 - Very fast. It takes ~15 seconds to load 1000 thumbnails
-- No docker container requires
 - No thumnails conversion prior tu use
+- No extra database
+- No docker container
 
 # Screenshots
 
@@ -31,12 +32,14 @@ In summary:
 
 First you must build the addon [pgf2jpg](./addons/pgf2jpg/README.md)
 
-Then install node dependencies with `pnpm`:
+Then install node dependencies with `npm`:
 
 ``` bash
 $ cd ${digikamweb_sourcedir}/backend
-$ pnpm install
+$ npm install
 ```
+
+You can ignore "``npm warn allow-scripts``" warnings. You get this message because the module is not plublished on the official npm registry.
 
 # Quick start
 

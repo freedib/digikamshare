@@ -5,6 +5,7 @@ tables.txt
 .settings/
 photos/
 node_modules/
+package-lock.json
 build/
 build-cli/
 jslibs/

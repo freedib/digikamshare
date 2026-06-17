@@ -12,34 +12,32 @@ The original library [libPGF](https://libpgf.org/) was written for Windows.
 
 [@stbrumme/toojpeg](https://github.com/stbrumme/toojpeg) for light JPEG generation.
 
-## Build pgf2jpg node addon
+## Dependencies
+
+cmake and nodejs must be installed.
+
+``` bash
+$ sudo apt install cmake nodejs npm
+```
+
+## Build pgf2jpg nodejs addon
 
 ``` bash
 $ cd ${digikamweb_sourcedir}/addons/pgf2jpg
-$ 
-$ npx cmake-js compile
+$ npm install
 ```
 
-## Dependencies
-
-Node addons building depends on the module node-addon-api. If you get compile error, install the missing module.
-
-``` bash
-$ pnpnm
-$ pnpm install node-addon-api
-
-```
-
+This will install nodejs dependencies and compile addon.
 
 The backend will search the addon under ```${digikamweb_sourcedir}/addons/pgf2jpg/build/Release ```
 
-## Build cli module
+## Build cli module (optionnal)
 
 May be useful to extract manually PGF files.
 
 ``` bash
 $ cd ${digikamweb_sourcedir}/addons/pgf2jpg
-$ mkdir -p build-cli							# first time
+$ mkdir -p build-cli					# first time
 $ cd build-cli
 $ cmake -DCLI=ON -DCMAKE_BUILD_TYPE=Debug ..		# first time
 $ make
