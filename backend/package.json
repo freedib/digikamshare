@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "module": "./digikamweb.mjs",
+  "module": "./digikamshare.mjs",
   "scripts": {
-    "start": "node digikamweb.mjs"
+    "start": "node digikamshare.mjs"
   },
   "dependencies": {
     "@zip.js/zip.js": "2.7.39",

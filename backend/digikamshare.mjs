@@ -1,5 +1,5 @@
 
-// digiKam web - backend
+// digiKam share - backend
 
 // Didier Bertrand © 2026
 
@@ -64,7 +64,7 @@ for (var iarg = 2; iarg < process.argv.length; iarg++) {
 var config = null;
 
 try {
-	const toml_text = fs.readFileSync('digikamweb.toml', 'utf8');
+	const toml_text = fs.readFileSync('digikamshare.toml', 'utf8');
 	config = toml.parse(toml_text);
 } catch (e) {
 	console.error("Error parsing toml content on line " + e.line + ", column " + e.column + ": " + e.message);
@@ -94,8 +94,8 @@ const app = express();
 var httpserver, updateserver;
 
 if (config.http.force_ssl) {
-	var privateKey = fs.readFileSync(path.join(config.http.ssl_directory,'digikamweb.key'), 'utf8');
-	var certificate = fs.readFileSync(path.join(config.http.ssl_directory,'digikamweb.crt'), 'utf8');
+	var privateKey = fs.readFileSync(path.join(config.http.ssl_directory,'digikamshare.key'), 'utf8');
+	var certificate = fs.readFileSync(path.join(config.http.ssl_directory,'digikamshare.crt'), 'utf8');
 	var credentials = { key: privateKey, cert: certificate };
 	httpserver = https.createServer(credentials, app);
 }

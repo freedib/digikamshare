@@ -1,16 +1,15 @@
-# digiKam web viewer
+# digiKam share
 
 A light and efficient digiKam web viewer for home hosting, with a backend based on node.js and a SPA frontend based on jQuery.
 
-The web viewer allows to visualize photos with albums, tags and date criterias.
+Allows to:
+- Visualize thumbnails gallery with albums, tags and date criterias
+- Show or play selected photo/video 
+- Download selected photos to browser
+- Restrict albums and tags for specific users
+- Multilingual (Actually english and french) 
 
-To populate photos gallery, thumbnails are extracted from digiKam database and converted on the fly in memory to JPEG format.
-An addon to node.js is provided to allow this conversion.
-
-A click on a thumbnail show the original photo.
-
-Original photos can be downloaded to browser in a zip file.
-
+To populate photos gallery, thumbnails are extracted from digiKam database and converted on the fly in memory to JPEG format. An addon to node.js is provided to allow this conversion.
 
 In summary:
 - Very fast. It takes ~15 seconds to load 1000 thumbnails
@@ -43,21 +42,21 @@ You can ignore "``npm warn allow-scripts``" warnings. You get this message becau
 
 # Quick start
 
-Copy digikamweb-template.toml to digikamweb.toml and edit to configure database.
+Copy digikamshare-template.toml to digikamshare.toml and edit to configure database.
 
 If using MySQL internal mode, digiKam must be running prior to start the server. Alternatively it is possible to run mariadbd using the same connection parameters than digiKam as seen in 'ps -ef | grep digikam'
 
 ``` bash
-$ node digikamweb.mjs -v
+$ node digikamshare.mjs -v
 ``` 
 
 Run the server.
 
 ``` bash
-$ node digikamweb.mjs -v
+$ node digikamshare.mjs -v
 ```
 
-With a browser open [http://localhost:4000/](http://localhost:4000/). Port can be configures in digikamweb.toml.
+With a browser open [http://localhost:4000/](http://localhost:4000/). Port can be configures in digikamshare.toml.
 
 # GUI operation
 

@@ -10,4 +10,4 @@ build/
 build-cli/
 jslibs/
 download/*
-digikamweb.toml
+digikamshare.toml
